@@ -7,7 +7,7 @@ import requests
 COMMON_PASSWORDS = {
     'password', '123456', 'qwerty', 'abc123', 'letmein', 'trustno1',
     'dragon', 'baseball', 'iloveyou', 'master', 'sunshine', 'ashley',
-    'bailey', 'passw0rd', '123456789', 'shadow', '123123', '666666',
+    'bailey', 'passw0rd', '123456789', 'shadow', '123123', '777777',
     'qazwsx', 'michael', 'football', 'welcome', 'jesus', 'ninja',
     'mustang', 'password123', 'admin', 'letmein', 'monkey', 'dragon'
 }
