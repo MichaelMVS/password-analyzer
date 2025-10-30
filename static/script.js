@@ -4,20 +4,20 @@ const analyzeBtn = document.getElementById('analyze-btn');
 const resultsSection = document.getElementById('results-section');
 
 const vulnDescriptions = {
-    'too_short': 'Password is shorter than 8 characters',
-    'common_password': 'This is a commonly used password',
-    'keyboard_pattern': 'Contains keyboard patterns',
-    'excessive_repetition': 'Has excessive repeated characters',
-    'sequential_characters': 'Contains sequential characters',
-    'insufficient_character_variety': 'Needs more character variety'
+    'too_short': 'Insufficient length for adequate security (< 8 characters)',
+    'common_password': 'This password appears in common breach databases',
+    'keyboard_pattern': 'Contains sequential keyboard patterns (reduced entropy)',
+    'excessive_repetition': 'Excessive character repetition (weak randomness)',
+    'sequential_characters': 'Contains sequential character patterns (ABC, 123)',
+    'insufficient_character_variety': 'Lacks character class diversity'
 };
 
 const strengthDescriptions = {
-    'Very Strong': 'Excellent password with high security',
-    'Strong': 'Good password with solid security',
-    'Moderate': 'Acceptable but could be improved',
-    'Weak': 'Poor security, needs improvement',
-    'Very Weak': 'Very weak security'
+    'Very Strong': 'Excellent entropy and resistance to brute-force attacks',
+    'Strong': 'Good entropy with strong resistance to modern attack vectors',
+    'Moderate': 'Acceptable entropy but vulnerable to sophisticated attacks',
+    'Weak': 'Low entropy; vulnerable to dictionary and brute-force attacks',
+    'Very Weak': 'Critical entropy deficiency; easily compromised'
 };
 
 toggleBtn.addEventListener('click', () => {
@@ -57,13 +57,18 @@ analyzeBtn.addEventListener('click', async () => {
             body: JSON.stringify({ password })
         });
 
-        if (!response.ok) throw new Error('Analysis failed');
-        
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Response data:', data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Analysis failed');
+        }
+        
         displayResults(data);
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error analyzing password. Please try again.');
+        console.error('Full error:', error);
+        alert('Error analyzing password: ' + error.message);
     } finally {
         analyzeBtn.disabled = false;
         analyzeBtn.style.opacity = '1';
@@ -137,7 +142,7 @@ function updateCharacterTypes(charTypes) {
 
 function updateMetrics(data) {
     document.getElementById('metric-length').textContent = data.password_length;
-    document.getElementById('metric-entropy').textContent = data.entropy;
+    document.getElementById('metric-entropy').textContent = data.entropy + ' bits';
     
     const crackTime = data.time_to_crack.time || 'N/A';
     document.getElementById('metric-crack-time').textContent = crackTime;
@@ -150,7 +155,7 @@ function updateVulnerabilities(vulns) {
     if (vulns.length === 0) {
         const item = document.createElement('div');
         item.className = 'vuln-item';
-        item.innerHTML = '<i class="fas fa-check-circle"></i> No issues found! Your password looks good.';
+        item.innerHTML = '<i class="fas fa-check-circle"></i> No common vulnerabilities detected.';
         item.style.borderLeftColor = 'var(--success)';
         item.style.background = 'rgba(16, 185, 129, 0.1)';
         item.style.color = '#a7f3d0';

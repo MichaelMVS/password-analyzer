@@ -108,10 +108,70 @@ body {
 
 .main-title {
     font-size: 2rem;
-    margin-bottom: 40px;
+    margin-bottom: 12px;
     text-align: center;
     color: var(--white);
     font-weight: 700;
+}
+
+.intro-text {
+    text-align: center;
+    color: var(--gray-light);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.tech-section {
+    margin-top: 120px;
+    padding: 80px 0;
+    border-top: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.tech-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 50px;
+    text-align: center;
+    color: var(--white);
+    font-weight: 700;
+}
+
+.tech-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.tech-item {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.04) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    padding: 28px;
+    transition: all 0.3s ease;
+}
+
+.tech-item:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%);
+    transform: translateY(-4px);
+}
+
+.tech-item h3 {
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.tech-item p {
+    color: var(--gray-light);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 10px;
+}
+
+.tech-item p strong {
+    color: var(--white);
+    font-weight: 600;
 }
 
 .input-box {

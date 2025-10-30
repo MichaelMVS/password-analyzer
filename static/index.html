@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Analyzer - Check Your Password Strength</title>
+    <title>Cryptographic Password Strength Analyzer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -13,37 +13,38 @@
     <div class="container">
         <header class="header">
             <div class="logo">
-                <i class="fas fa-lock"></i>
-                <span>Password Analyzer</span>
+                <i class="fas fa-shield-alt"></i>
+                <span>Password Entropy Analyzer</span>
             </div>
-            <p class="subtitle">Check your password strength with detailed analysis</p>
+            <p class="subtitle">Advanced cryptographic analysis of password strength and entropy</p>
         </header>
 
         <main class="main">
             <section class="hero-section">
                 <div class="input-container">
-                    <h2 class="main-title">How strong is your password?</h2>
+                    <h2 class="main-title">Evaluate Password Cryptographic Strength</h2>
+                    <p class="intro-text">Analyze entropy, attack resistance, and vulnerability patterns using Shannon information theory</p>
                     <div class="input-box">
                         <div class="input-wrapper">
                             <input 
                                 type="password" 
                                 id="password-input" 
                                 class="password-input"
-                                placeholder="Enter your password..."
+                                placeholder="Enter password for analysis..."
                                 autocomplete="off"
                                 spellcheck="false"
                             >
-                            <button id="toggle-visibility" class="toggle-btn" title="Show/Hide password">
+                            <button id="toggle-visibility" class="toggle-btn" title="Toggle visibility">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                         <button id="analyze-btn" class="analyze-btn">
-                            <i class="fas fa-check"></i>
+                            <i class="fas fa-microscope"></i>
                             Analyze
                         </button>
                         <div class="input-hint">
-                            <i class="fas fa-shield"></i>
-                            Your password is analyzed locally. Nothing is sent to any server.
+                            <i class="fas fa-lock"></i>
+                            Analysis performed locally. No data transmission or storage.
                         </div>
                     </div>
                 </div>
@@ -78,32 +79,32 @@
                 <div class="analysis-grid">
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-check-double"></i>
-                            Character Types
+                            <i class="fas fa-chess"></i>
+                            Character Set Analysis
                         </h3>
                         <div class="character-types-list">
                             <div class="char-check" id="check-uppercase">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Uppercase A-Z</strong>
+                                    <strong>Uppercase Letters (A-Z)</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-lowercase">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Lowercase a-z</strong>
+                                    <strong>Lowercase Letters (a-z)</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-digits">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Numbers 0-9</strong>
+                                    <strong>Numeric Characters (0-9)</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-special">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Special !@#$%</strong>
+                                    <strong>Special Characters (!@#$%)</strong>
                                 </span>
                             </div>
                         </div>
@@ -111,26 +112,26 @@
 
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Stats
+                            <i class="fas fa-calculator"></i>
+                            Cryptographic Metrics
                         </h3>
                         <div class="stats-list">
                             <div class="stat">
-                                <span>Length: <strong id="metric-length">0</strong></span>
+                                <span><strong>Length:</strong> <span id="metric-length">0</span> characters</span>
                             </div>
                             <div class="stat">
-                                <span>Entropy: <strong id="metric-entropy">0</strong></span>
+                                <span><strong>Shannon Entropy:</strong> <span id="metric-entropy">0</span></span>
                             </div>
                             <div class="stat">
-                                <span>Crack Time: <strong id="metric-crack-time">N/A</strong></span>
+                                <span><strong>Brute Force Resistance:</strong> <span id="metric-crack-time">N/A</span></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-exclamation"></i>
-                            Issues
+                            <i class="fas fa-triangle-exclamation"></i>
+                            Security Vulnerabilities
                         </h3>
                         <div class="items-list alert-list" id="vuln-list"></div>
                     </div>
@@ -138,7 +139,7 @@
                     <div class="card full-width">
                         <h3 class="card-title">
                             <i class="fas fa-lightbulb"></i>
-                            Tips to Improve
+                            Recommendations
                         </h3>
                         <div class="items-list recommendations-list" id="rec-list"></div>
                     </div>
@@ -146,27 +147,48 @@
             </section>
 
             <section class="info-section">
-                <h2>What Makes a Strong Password?</h2>
+                <h2>Advanced Analysis Methodology</h2>
                 <div class="features-grid">
                     <div class="feature">
-                        <i class="fas fa-arrows-alt-h"></i>
-                        <h3>Length</h3>
-                        <p>At least 12 characters is ideal. Longer passwords are harder to crack.</p>
+                        <i class="fas fa-wave-square"></i>
+                        <h3>Shannon Entropy Calculation</h3>
+                        <p>Quantifies information randomness using H(X) = -Σ p(x) log₂ p(x), measuring password unpredictability across the character space.</p>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-palette"></i>
-                        <h3>Variety</h3>
-                        <p>Mix uppercase, lowercase, numbers, and special characters.</p>
+                        <i class="fas fa-network-wired"></i>
+                        <h3>Pattern Recognition</h3>
+                        <p>Detects keyboard patterns, sequential characters, dictionary words, and common heuristics that significantly reduce effective entropy.</p>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-ban"></i>
-                        <h3>Avoid Patterns</h3>
-                        <p>Don't use common words, sequences, or keyboard patterns.</p>
+                        <i class="fas fa-bolt"></i>
+                        <h3>Brute Force Estimation</h3>
+                        <p>Calculates resistance to exhaustive search at 10¹² attempts/second, estimating time-to-compromise across attack scenarios.</p>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-random"></i>
-                        <h3>Randomness</h3>
-                        <p>Use random combinations, not personal info or common words.</p>
+                        <i class="fas fa-database"></i>
+                        <h3>Dictionary Attack Analysis</h3>
+                        <p>Cross-references against known breach databases and common password lists to identify compromised or predictable credentials.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tech-section">
+                <h2>Technical Implementation</h2>
+                <div class="tech-content">
+                    <div class="tech-item">
+                        <h3>Backend Architecture</h3>
+                        <p><strong>Framework:</strong> FastAPI with asynchronous request handling</p>
+                        <p><strong>Analysis Engine:</strong> Custom cryptographic analysis module implementing Shannon entropy calculations and pattern detection algorithms.</p>
+                    </div>
+                    <div class="tech-item">
+                        <h3>Security Considerations</h3>
+                        <p><strong>Client-side Analysis:</strong> All password evaluation occurs locally in the browser; no credentials transmitted to servers.</p>
+                        <p><strong>CORS Enabled:</strong> Cross-origin resource sharing configured for API accessibility without authentication.</p>
+                    </div>
+                    <div class="tech-item">
+                        <h3>Algorithm Details</h3>
+                        <p><strong>Entropy Metric:</strong> Password entropy = log₂(N)^L where N = character set size, L = password length</p>
+                        <p><strong>Crack Time:</strong> t = C/2 ÷ G where C = total combinations, G = guesses per second (10¹²)</p>
                     </div>
                 </div>
             </section>
@@ -174,11 +196,11 @@
 
         <footer class="footer">
             <div class="footer-content">
-                <p><strong>Password Analyzer</strong> - Analyze password strength locally in your browser.</p>
-                <p><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> View on GitHub</a></p>
+                <p><strong>Password Entropy Analyzer</strong> — Cryptographic strength evaluation tool for security research and education.</p>
+                <p><a href="https://github.com/MichaelMVS/password-analyzer" target="_blank"><i class="fab fa-github"></i> Source Code</a> | Open source for academic and professional use.</p>
             </div>
             <p class="footer-bottom">
-                Made for security-conscious developers. No data is sent anywhere.
+                Designed for cybersecurity professionals, students, and security-conscious developers.
             </p>
         </footer>
     </div>
