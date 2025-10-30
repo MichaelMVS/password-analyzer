@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,9 +21,9 @@ analyzer = PasswordAnalyzer()
 class PasswordRequest(BaseModel):
     password: str
 
-@app.get("/")
-async def root():
-    return FileResponse("static/index.html")
+@app.get("/api/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.post("/api/analyze")
 async def analyze_password(request: PasswordRequest):
@@ -36,9 +36,11 @@ async def analyze_password(request: PasswordRequest):
     result = analyzer.analyze(request.password)
     return JSONResponse(content=result)
 
-@app.get("/api/health")
-async def health_check():
-    return {"status": "ok"}
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+async def root():
+    return FileResponse("static/index.html")
 
 if __name__ == "__main__":
     import uvicorn
