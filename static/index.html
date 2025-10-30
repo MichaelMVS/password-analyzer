@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Security Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🔐 Password Security Analyzer</h1>
+                <p class="subtitle">Comprehensive password strength analysis and recommendations</p>
+            </div>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <div class="input-group">
+                    <label for="password-input">Enter your password for analysis:</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password-input" 
+                            placeholder="Type your password here..."
+                            autocomplete="off"
+                        >
+                        <button id="toggle-visibility" class="toggle-btn" title="Toggle visibility">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="strength-card">
+                    <div class="strength-header">
+                        <h2>Strength Assessment</h2>
+                        <div class="strength-badge" id="strength-badge">
+                            <span class="strength-label" id="strength-label"></span>
+                            <span class="strength-score" id="strength-score"></span>
+                        </div>
+                    </div>
+                    <div class="strength-meter">
+                        <div class="meter-bar">
+                            <div class="meter-fill" id="meter-fill"></div>
+                        </div>
+                        <div class="meter-labels">
+                            <span>Weak</span>
+                            <span>Strong</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-grid">
+                    <div class="card character-types">
+                        <h3>Character Types</h3>
+                        <div class="char-type-list">
+                            <div class="char-check" id="check-uppercase">
+                                <span class="icon">📤</span>
+                                <span>Uppercase Letters</span>
+                            </div>
+                            <div class="char-check" id="check-lowercase">
+                                <span class="icon">📥</span>
+                                <span>Lowercase Letters</span>
+                            </div>
+                            <div class="char-check" id="check-digits">
+                                <span class="icon">🔢</span>
+                                <span>Digits</span>
+                            </div>
+                            <div class="char-check" id="check-special">
+                                <span class="icon">⚡</span>
+                                <span>Special Characters</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card metrics">
+                        <h3>Key Metrics</h3>
+                        <div class="metrics-list">
+                            <div class="metric">
+                                <span class="metric-label">Length:</span>
+                                <span class="metric-value" id="metric-length">0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Entropy:</span>
+                                <span class="metric-value" id="metric-entropy">0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Time to Crack:</span>
+                                <span class="metric-value" id="metric-crack-time">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card patterns">
+                        <h3>Patterns Detected</h3>
+                        <div class="pattern-list" id="pattern-list"></div>
+                    </div>
+
+                    <div class="card vulnerabilities">
+                        <h3>Vulnerabilities</h3>
+                        <div class="vuln-list" id="vuln-list"></div>
+                    </div>
+
+                    <div class="card recommendations full-width">
+                        <h3>Recommendations</h3>
+                        <div class="rec-list" id="rec-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="info-section">
+                <h2>How It Works</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Entropy Analysis</h3>
+                        <p>Calculates the theoretical strength based on password length and character set variety using Shannon entropy principles.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Pattern Detection</h3>
+                        <p>Identifies common vulnerabilities like sequential characters, keyboard patterns, and date formats.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Crack Time Estimation</h3>
+                        <p>Estimates resistance to brute-force attacks at 1 trillion guesses per second.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Character Analysis</h3>
+                        <p>Evaluates the diversity and distribution of uppercase, lowercase, numbers, and special characters.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>🔒 All analysis happens locally in your browser. No passwords are sent to any server.</p>
+            <p><a href="https://github.com" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
