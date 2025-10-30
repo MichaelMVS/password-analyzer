@@ -4,12 +4,15 @@ const analyzeBtn = document.getElementById('analyze-btn');
 const resultsSection = document.getElementById('results-section');
 
 const vulnDescriptions = {
-    'too_short': 'Insufficient length for adequate security (< 8 characters)',
+    'too_short': 'Password is too short for adequate security (minimum 8 characters)',
+    'suboptimal_length': 'Password length could be improved for better security (aim for 16+ characters)',
     'common_password': 'This password appears in common breach databases',
     'keyboard_pattern': 'Contains sequential keyboard patterns (reduced entropy)',
     'excessive_repetition': 'Excessive character repetition (weak randomness)',
     'sequential_characters': 'Contains sequential character patterns (ABC, 123)',
-    'insufficient_character_variety': 'Lacks character class diversity'
+    'insufficient_character_variety': 'Lacks character class diversity',
+    'low_entropy': 'Insufficient entropy for strong security',
+    'dictionary_words': 'Contains common dictionary words'
 };
 
 const strengthDescriptions = {
@@ -90,6 +93,7 @@ function displayResults(data) {
     updateMetrics(data);
     updateVulnerabilities(data.vulnerabilities);
     updateRecommendations(data.recommendations);
+    updateAttackScenarios(data.time_to_crack, data.attack_scenarios);
 }
 
 function updateStrengthMeter(score, label) {
@@ -141,10 +145,10 @@ function updateCharacterTypes(charTypes) {
 }
 
 function updateMetrics(data) {
-    document.getElementById('metric-length').textContent = data.password_length;
-    document.getElementById('metric-entropy').textContent = data.entropy + ' bits';
+    document.getElementById('metric-length').textContent = data.password_length + ' chars';
+    document.getElementById('metric-entropy').textContent = data.effective_entropy + ' bits';
     
-    const crackTime = data.time_to_crack.time || 'N/A';
+    const crackTime = data.time_to_crack.offline_attack || 'N/A';
     document.getElementById('metric-crack-time').textContent = crackTime;
 }
 
@@ -155,7 +159,7 @@ function updateVulnerabilities(vulns) {
     if (vulns.length === 0) {
         const item = document.createElement('div');
         item.className = 'vuln-item';
-        item.innerHTML = '<i class="fas fa-check-circle"></i> No common vulnerabilities detected.';
+        item.innerHTML = '<i class="fas fa-check-circle"></i> No critical vulnerabilities detected!';
         item.style.borderLeftColor = 'var(--success)';
         item.style.background = 'rgba(16, 185, 129, 0.1)';
         item.style.color = '#a7f3d0';
@@ -166,7 +170,8 @@ function updateVulnerabilities(vulns) {
     vulns.forEach(vuln => {
         const item = document.createElement('div');
         item.className = 'vuln-item';
-        item.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${vulnDescriptions[vuln] || vuln}`;
+        const description = vulnDescriptions[vuln] || vuln;
+        item.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${description}`;
         container.appendChild(item);
     });
 }
@@ -181,6 +186,31 @@ function updateRecommendations(recs) {
         item.innerHTML = `<i class="fas fa-check"></i> ${rec}`;
         container.appendChild(item);
     });
+}
+
+function updateAttackScenarios(cracktimes, scenarios) {
+    const container = document.getElementById('attack-scenarios');
+    
+    if (!container) {
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    const attackLabels = {
+        'online_attack': '<i class="fas fa-globe"></i> Online Attack (Rate Limited)',
+        'offline_attack': '<i class="fas fa-server"></i> Offline Attack (Brute Force)',
+        'gpu_attack': '<i class="fas fa-microchip"></i> GPU Attack',
+        'specialized_attack': '<i class="fas fa-rocket"></i> Specialized Hardware'
+    };
+    
+    for (const [key, time] of Object.entries(cracktimes)) {
+        const item = document.createElement('div');
+        item.className = 'scenario-item';
+        const label = attackLabels[key] || key;
+        item.innerHTML = `<div class="scenario-label">${label}</div><div class="scenario-time">${time}</div>`;
+        container.appendChild(item);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -174,6 +174,43 @@ body {
     font-weight: 600;
 }
 
+.attack-scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.scenario-item {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.04) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.3s ease;
+}
+
+.scenario-item:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%);
+    transform: translateY(-2px);
+}
+
+.scenario-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.scenario-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--white);
+    word-break: break-word;
+}
+
 .input-box {
     animation: fadeInDown 0.8s ease-out;
 }
