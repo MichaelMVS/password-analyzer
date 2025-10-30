@@ -1,40 +1,28 @@
 const passwordInput = document.getElementById('password-input');
 const toggleBtn = document.getElementById('toggle-visibility');
-const copyBtn = document.getElementById('copy-btn');
+const analyzeBtn = document.getElementById('analyze-btn');
 const resultsSection = document.getElementById('results-section');
 
 const vulnDescriptions = {
     'too_short': 'Password is shorter than 8 characters',
     'common_password': 'This is a commonly used password',
-    'keyboard_pattern': 'Contains keyboard patterns (qwerty, asdfgh, etc.)',
-    'excessive_repetition': 'Contains excessive repeated characters',
-    'sequential_characters': 'Contains sequential characters (abc, 123, etc.)',
-    'insufficient_character_variety': 'Uses only one type of character'
-};
-
-const patternDescriptions = {
-    'sequential_chars': 'Sequential characters detected',
-    'repeated_chars': 'Repeated characters detected',
-    'keyboard_pattern': 'Keyboard pattern detected',
-    'date_pattern': 'Date format detected',
-    'email_pattern': 'Email format detected',
-    'username_pattern': 'Username-like pattern detected'
+    'keyboard_pattern': 'Contains keyboard patterns',
+    'excessive_repetition': 'Has excessive repeated characters',
+    'sequential_characters': 'Contains sequential characters',
+    'insufficient_character_variety': 'Needs more character variety'
 };
 
 const strengthDescriptions = {
     'Very Strong': 'Excellent password with high security',
     'Strong': 'Good password with solid security',
-    'Moderate': 'Acceptable password, could be improved',
+    'Moderate': 'Acceptable but could be improved',
     'Weak': 'Poor security, needs improvement',
-    'Very Weak': 'Insufficient security'
+    'Very Weak': 'Very weak security'
 };
-
-let debounceTimer;
 
 toggleBtn.addEventListener('click', () => {
     const type = passwordInput.type === 'password' ? 'text' : 'password';
     passwordInput.type = type;
-    toggleBtn.classList.toggle('active');
     updateToggleBtnIcon();
 });
 
@@ -49,63 +37,52 @@ function updateToggleBtnIcon() {
     }
 }
 
-copyBtn.addEventListener('click', () => {
-    const score = document.getElementById('strength-score').textContent;
-    const label = document.getElementById('strength-label').textContent;
-    const text = `Password Strength: ${label} (${score})`;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-        copyBtn.style.color = 'var(--success)';
-        
-        setTimeout(() => {
-            copyBtn.innerHTML = originalText;
-            copyBtn.style.color = '';
-        }, 2000);
-    });
-});
-
-passwordInput.addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    
-    const password = e.target.value;
+analyzeBtn.addEventListener('click', async () => {
+    const password = passwordInput.value;
     
     if (!password) {
-        resultsSection.style.display = 'none';
-        copyBtn.style.display = 'none';
+        alert('Please enter a password to analyze');
         return;
     }
     
-    copyBtn.style.display = 'flex';
+    analyzeBtn.disabled = true;
+    analyzeBtn.style.opacity = '0.7';
     
-    debounceTimer = setTimeout(async () => {
-        try {
-            const response = await fetch('/api/analyze', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ password })
-            });
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password })
+        });
 
-            if (!response.ok) throw new Error('Analysis failed');
-            
-            const data = await response.json();
-            displayResults(data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }, 100);
+        if (!response.ok) throw new Error('Analysis failed');
+        
+        const data = await response.json();
+        displayResults(data);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error analyzing password. Please try again.');
+    } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.style.opacity = '1';
+    }
+});
+
+passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        analyzeBtn.click();
+    }
 });
 
 function displayResults(data) {
     resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
     
     updateStrengthMeter(data.strength_score, data.strength_label);
     updateCharacterTypes(data.character_types);
     updateMetrics(data);
-    updatePatterns(data.patterns);
     updateVulnerabilities(data.vulnerabilities);
     updateRecommendations(data.recommendations);
 }
@@ -166,19 +143,6 @@ function updateMetrics(data) {
     document.getElementById('metric-crack-time').textContent = crackTime;
 }
 
-function updatePatterns(patterns) {
-    const container = document.getElementById('pattern-list');
-    container.innerHTML = '';
-    
-    Object.entries(patterns).forEach(([key, value]) => {
-        const item = document.createElement('div');
-        item.className = 'pattern-item';
-        if (value) item.classList.add('active');
-        item.textContent = patternDescriptions[key] || key;
-        container.appendChild(item);
-    });
-}
-
 function updateVulnerabilities(vulns) {
     const container = document.getElementById('vuln-list');
     container.innerHTML = '';
@@ -186,9 +150,9 @@ function updateVulnerabilities(vulns) {
     if (vulns.length === 0) {
         const item = document.createElement('div');
         item.className = 'vuln-item';
-        item.innerHTML = '<i class="fas fa-shield"></i> No vulnerabilities detected! Your password looks secure.';
+        item.innerHTML = '<i class="fas fa-check-circle"></i> No issues found! Your password looks good.';
         item.style.borderLeftColor = 'var(--success)';
-        item.style.background = 'rgba(16, 185, 129, 0.08)';
+        item.style.background = 'rgba(16, 185, 129, 0.1)';
         item.style.color = '#a7f3d0';
         container.appendChild(item);
         return;
@@ -197,7 +161,7 @@ function updateVulnerabilities(vulns) {
     vulns.forEach(vuln => {
         const item = document.createElement('div');
         item.className = 'vuln-item';
-        item.innerHTML = `<i class="fas fa-warning"></i> ${vulnDescriptions[vuln] || vuln}`;
+        item.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${vulnDescriptions[vuln] || vuln}`;
         container.appendChild(item);
     });
 }
@@ -209,7 +173,7 @@ function updateRecommendations(recs) {
     recs.forEach(rec => {
         const item = document.createElement('div');
         item.className = 'rec-item';
-        item.innerHTML = `<i class="fas fa-check-circle"></i> ${rec}`;
+        item.innerHTML = `<i class="fas fa-check"></i> ${rec}`;
         container.appendChild(item);
     });
 }

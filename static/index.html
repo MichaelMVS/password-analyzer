@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Security Analyzer - Professional Password Strength Checker</title>
+    <title>Password Analyzer - Check Your Password Strength</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -12,45 +12,38 @@
     
     <div class="container">
         <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-shield-halved"></i>
-                    <span>SecurePass</span>
-                </div>
-                <div class="header-info">
-                    <h1>Password Security Analyzer</h1>
-                    <p class="subtitle">Advanced password strength analysis with real-time feedback</p>
-                </div>
+            <div class="logo">
+                <i class="fas fa-lock"></i>
+                <span>Password Analyzer</span>
             </div>
+            <p class="subtitle">Check your password strength with detailed analysis</p>
         </header>
 
         <main class="main">
             <section class="hero-section">
                 <div class="input-container">
+                    <h2 class="main-title">How strong is your password?</h2>
                     <div class="input-box">
-                        <label for="password-input" class="input-label">
-                            <i class="fas fa-lock"></i>
-                            Enter your password for analysis
-                        </label>
                         <div class="input-wrapper">
                             <input 
                                 type="password" 
                                 id="password-input" 
                                 class="password-input"
-                                placeholder="Type your password here..."
+                                placeholder="Enter your password..."
                                 autocomplete="off"
                                 spellcheck="false"
                             >
                             <button id="toggle-visibility" class="toggle-btn" title="Show/Hide password">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button id="copy-btn" class="copy-btn" title="Copy strength to clipboard" style="display: none;">
-                                <i class="fas fa-copy"></i>
-                            </button>
                         </div>
+                        <button id="analyze-btn" class="analyze-btn">
+                            <i class="fas fa-check"></i>
+                            Analyze
+                        </button>
                         <div class="input-hint">
-                            <i class="fas fa-info-circle"></i>
-                            Your password is analyzed locally in your browser. It's never sent to our servers.
+                            <i class="fas fa-shield"></i>
+                            Your password is analyzed locally. Nothing is sent to any server.
                         </div>
                     </div>
                 </div>
@@ -59,17 +52,13 @@
             <section class="results-section" id="results-section" style="display: none;">
                 <div class="strength-assessment">
                     <div class="strength-card main-strength">
-                        <h2 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Strength Assessment
-                        </h2>
                         <div class="strength-content">
                             <div class="strength-display">
                                 <div class="strength-circle" id="strength-circle">
                                     <span class="score-text" id="strength-score">0</span>
                                 </div>
                                 <div class="strength-info">
-                                    <div class="strength-label" id="strength-label">Loading...</div>
+                                    <div class="strength-label" id="strength-label">Analyzing...</div>
                                     <div class="strength-description" id="strength-desc"></div>
                                 </div>
                             </div>
@@ -78,8 +67,8 @@
                                     <div class="meter-fill" id="meter-fill"></div>
                                 </div>
                                 <div class="meter-labels">
-                                    <span><i class="fas fa-exclamation-circle"></i> Weak</span>
-                                    <span><i class="fas fa-check-circle"></i> Strong</span>
+                                    <span>Weak</span>
+                                    <span>Strong</span>
                                 </div>
                             </div>
                         </div>
@@ -89,36 +78,32 @@
                 <div class="analysis-grid">
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-font"></i>
+                            <i class="fas fa-check-double"></i>
                             Character Types
                         </h3>
                         <div class="character-types-list">
                             <div class="char-check" id="check-uppercase">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Uppercase</strong>
-                                    <small>A-Z</small>
+                                    <strong>Uppercase A-Z</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-lowercase">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Lowercase</strong>
-                                    <small>a-z</small>
+                                    <strong>Lowercase a-z</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-digits">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Digits</strong>
-                                    <small>0-9</small>
+                                    <strong>Numbers 0-9</strong>
                                 </span>
                             </div>
                             <div class="char-check" id="check-special">
                                 <span class="check-icon"><i class="fas fa-check"></i></span>
                                 <span class="check-text">
-                                    <strong>Special</strong>
-                                    <small>!@#$%^&*</small>
+                                    <strong>Special !@#$%</strong>
                                 </span>
                             </div>
                         </div>
@@ -126,52 +111,26 @@
 
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-calculator"></i>
-                            Metrics
+                            <i class="fas fa-chart-bar"></i>
+                            Stats
                         </h3>
-                        <div class="metrics-grid">
-                            <div class="metric-item">
-                                <div class="metric-icon">
-                                    <i class="fas fa-ruler"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <span class="metric-label">Length</span>
-                                    <span class="metric-value" id="metric-length">0</span>
-                                </div>
+                        <div class="stats-list">
+                            <div class="stat">
+                                <span>Length: <strong id="metric-length">0</strong></span>
                             </div>
-                            <div class="metric-item">
-                                <div class="metric-icon">
-                                    <i class="fas fa-dice"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <span class="metric-label">Entropy</span>
-                                    <span class="metric-value" id="metric-entropy">0</span>
-                                </div>
+                            <div class="stat">
+                                <span>Entropy: <strong id="metric-entropy">0</strong></span>
                             </div>
-                            <div class="metric-item">
-                                <div class="metric-icon">
-                                    <i class="fas fa-hourglass-end"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <span class="metric-label">Crack Time</span>
-                                    <span class="metric-value" id="metric-crack-time">N/A</span>
-                                </div>
+                            <div class="stat">
+                                <span>Crack Time: <strong id="metric-crack-time">N/A</strong></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="card">
                         <h3 class="card-title">
-                            <i class="fas fa-magnifying-glass"></i>
-                            Patterns Detected
-                        </h3>
-                        <div class="items-list" id="pattern-list"></div>
-                    </div>
-
-                    <div class="card alert-card">
-                        <h3 class="card-title">
-                            <i class="fas fa-triangle-exclamation"></i>
-                            Vulnerabilities
+                            <i class="fas fa-exclamation"></i>
+                            Issues
                         </h3>
                         <div class="items-list alert-list" id="vuln-list"></div>
                     </div>
@@ -179,7 +138,7 @@
                     <div class="card full-width">
                         <h3 class="card-title">
                             <i class="fas fa-lightbulb"></i>
-                            Recommendations
+                            Tips to Improve
                         </h3>
                         <div class="items-list recommendations-list" id="rec-list"></div>
                     </div>
@@ -187,65 +146,27 @@
             </section>
 
             <section class="info-section">
-                <h2 class="section-title">
-                    <i class="fas fa-book"></i>
-                    How It Works
-                </h2>
+                <h2>What Makes a Strong Password?</h2>
                 <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-microchip"></i>
-                        </div>
-                        <h3>Entropy Analysis</h3>
-                        <p>Calculates Shannon entropy to measure password complexity and randomness</p>
+                    <div class="feature">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        <h3>Length</h3>
+                        <p>At least 12 characters is ideal. Longer passwords are harder to crack.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3>Pattern Detection</h3>
-                        <p>Identifies keyboard patterns, sequences, and common vulnerable formats</p>
+                    <div class="feature">
+                        <i class="fas fa-palette"></i>
+                        <h3>Variety</h3>
+                        <p>Mix uppercase, lowercase, numbers, and special characters.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3>Brute Force Resistance</h3>
-                        <p>Estimates crack time against 1 trillion guesses per second attacks</p>
+                    <div class="feature">
+                        <i class="fas fa-ban"></i>
+                        <h3>Avoid Patterns</h3>
+                        <p>Don't use common words, sequences, or keyboard patterns.</p>
                     </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-fingerprint"></i>
-                        </div>
-                        <h3>Character Analysis</h3>
-                        <p>Evaluates diversity and distribution of character types used</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="security-section">
-                <div class="security-content">
-                    <h2 class="section-title">
-                        <i class="fas fa-lock"></i>
-                        Your Privacy Matters
-                    </h2>
-                    <div class="security-features">
-                        <div class="security-feature">
-                            <span class="feature-check"><i class="fas fa-shield"></i></span>
-                            <p>All analysis happens locally in your browser</p>
-                        </div>
-                        <div class="security-feature">
-                            <span class="feature-check"><i class="fas fa-ban"></i></span>
-                            <p>No passwords are ever transmitted to servers</p>
-                        </div>
-                        <div class="security-feature">
-                            <span class="feature-check"><i class="fas fa-database"></i></span>
-                            <p>No data is stored or logged anywhere</p>
-                        </div>
-                        <div class="security-feature">
-                            <span class="feature-check"><i class="fas fa-code"></i></span>
-                            <p>Open source - inspect our code on GitHub</p>
-                        </div>
+                    <div class="feature">
+                        <i class="fas fa-random"></i>
+                        <h3>Randomness</h3>
+                        <p>Use random combinations, not personal info or common words.</p>
                     </div>
                 </div>
             </section>
@@ -253,30 +174,12 @@
 
         <footer class="footer">
             <div class="footer-content">
-                <div class="footer-section">
-                    <h3>About</h3>
-                    <p>SecurePass helps you create and evaluate strong passwords with advanced security analysis.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> View on GitHub</a></li>
-                        <li><a href="https://github.com" target="_blank"><i class="fas fa-bug"></i> Report Issues</a></li>
-                        <li><a href="https://github.com" target="_blank"><i class="fas fa-star"></i> Star the Repo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Security Tips</h3>
-                    <ul>
-                        <li>Use unique passwords for each account</li>
-                        <li>Enable two-factor authentication</li>
-                        <li>Use a password manager</li>
-                    </ul>
-                </div>
+                <p><strong>Password Analyzer</strong> - Analyze password strength locally in your browser.</p>
+                <p><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> View on GitHub</a></p>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 SecurePass. Made with <i class="fas fa-heart"></i> for better security.</p>
-            </div>
+            <p class="footer-bottom">
+                Made for security-conscious developers. No data is sent anywhere.
+            </p>
         </footer>
     </div>
 
