@@ -1,6 +1,9 @@
 import re
 import math
-from typing import Dict, List, Tuple
+import numpy as np
+from typing import Dict, List
+from collections import Counter
+from scipy import stats
 
 COMMON_PASSWORDS = {
     'password', '123456', 'qwerty', 'abc123', 'letmein', 'trustno1',
@@ -8,28 +11,24 @@ COMMON_PASSWORDS = {
     'bailey', 'passw0rd', '123456789', 'shadow', '123123', '777777',
     'qazwsx', 'michael', 'football', 'welcome', 'jesus', 'ninja',
     'mustang', 'password123', 'admin', 'letmein', 'monkey', 'dragon',
-    '111111', 'welcome', '1234567', 'login', 'princess', 'starwars'
+    '111111', '1234567', 'login', 'princess', 'starwars'
 }
 
 KEYBOARD_PATTERNS = {
     'qwerty', 'asdfgh', 'zxcvbn', 'qazwsx', 'qwertyuiop', 'asdfghjkl',
-    'zxcvbnm', 'qweasd', '1234567890', 'abcdef', 'qwertyu', 'asdfghjk',
-    'zxcvbn', 'dvorak', 'colemak'
+    'zxcvbnm', 'qweasd', '1234567890', 'abcdef', 'dvorak', 'colemak',
+    'qwertyu', 'asdfghjk', 'zxcvbn'
 }
 
-COMMON_SUBSTITUTIONS = {
-    'a': '@', 'e': '3', 'i': '1', 'o': '0', 's': '$', 't': '7', 'l': '1'
-}
-
-class PasswordAnalyzer:
+class AdvancedPasswordAnalyzer:
     def __init__(self):
-        self.results = {}
         self.attack_speeds = {
             'online': 100,
             'offline': 1e9,
             'gpu': 1e10,
             'specialized': 1e12
         }
+        self.markov_cache = {}
 
     def analyze(self, password: str) -> Dict:
         try:
@@ -40,10 +39,11 @@ class PasswordAnalyzer:
             
             character_types = self._analyze_character_types(password)
             patterns = self._detect_patterns(password)
-            entropy_data = self._calculate_advanced_entropy(password, character_types)
-            vulnerabilities = self._find_vulnerabilities(password, character_types, patterns, entropy_data)
-            crack_times = self._estimate_crack_times(password, entropy_data)
-            strength_score = self._calculate_nist_strength_score(password, character_types, entropy_data, vulnerabilities)
+            
+            entropy_analysis = self._calculate_advanced_entropy_zxcvbn_style(password, character_types)
+            vulnerabilities = self._find_vulnerabilities(password, character_types, patterns, entropy_analysis)
+            crack_times = self._estimate_crack_times_ml_based(password, entropy_analysis)
+            strength_score = self._calculate_neural_inspired_score(password, character_types, entropy_analysis, vulnerabilities)
             strength_label = self._get_strength_label(strength_score)
             recommendations = self._get_recommendations(password, character_types, patterns)
             
@@ -51,14 +51,14 @@ class PasswordAnalyzer:
                 'password_length': len(password),
                 'strength_score': int(strength_score),
                 'strength_label': str(strength_label),
-                'entropy': float(entropy_data['shannon_entropy']),
-                'effective_entropy': float(entropy_data['effective_entropy']),
+                'entropy': float(entropy_analysis['shannon_entropy']),
+                'effective_entropy': float(entropy_analysis['effective_entropy']),
                 'character_types': character_types,
                 'patterns': patterns,
                 'vulnerabilities': vulnerabilities,
                 'time_to_crack': crack_times,
                 'recommendations': recommendations,
-                'attack_scenarios': self._generate_attack_scenarios(entropy_data)
+                'attack_scenarios': self._generate_attack_scenarios(entropy_analysis)
             }
             
             return self.results
@@ -103,31 +103,98 @@ class PasswordAnalyzer:
             'special_count': len(re.findall(r'[!@#$%^&*()_+\-=\[\]{};:\'",.<>?/\\|`~]', password))
         }
 
-    def _calculate_advanced_entropy(self, password: str, char_types: Dict) -> Dict:
+    def _calculate_advanced_entropy_zxcvbn_style(self, password: str, char_types: Dict) -> Dict:
         try:
-            charset_size = self._calculate_charset_size(password)
-            shannon_entropy = len(password) * math.log2(charset_size) if charset_size > 1 else 0
+            shannon_entropy = self._calculate_shannon_entropy(password)
+            conditional_entropy = self._calculate_conditional_entropy(password)
+            frequency_entropy = self._calculate_frequency_entropy(password)
+            markov_entropy = self._calculate_markov_entropy(password)
             
-            patterns_penalty = self._calculate_pattern_entropy_penalty(password)
-            dictionary_penalty = self._calculate_dictionary_penalty(password)
+            pattern_penalty = self._calculate_pattern_entropy_penalty_advanced(password)
+            dictionary_penalty = self._calculate_dictionary_penalty_advanced(password)
+            repetition_penalty = self._calculate_repetition_penalty(password)
+            predictability_penalty = self._calculate_predictability_penalty(password)
             
-            effective_entropy = max(0, shannon_entropy - patterns_penalty - dictionary_penalty)
+            total_penalty = pattern_penalty + dictionary_penalty + repetition_penalty + predictability_penalty
+            
+            effective_entropy = max(0, shannon_entropy - total_penalty)
+            
+            estimated_entropy = (shannon_entropy * 0.4 + conditional_entropy * 0.3 + 
+                               frequency_entropy * 0.15 + markov_entropy * 0.15)
             
             return {
                 'shannon_entropy': round(float(shannon_entropy), 2),
+                'conditional_entropy': round(float(conditional_entropy), 2),
+                'frequency_entropy': round(float(frequency_entropy), 2),
+                'markov_entropy': round(float(markov_entropy), 2),
                 'effective_entropy': round(float(effective_entropy), 2),
-                'charset_size': charset_size,
-                'pattern_penalty': patterns_penalty,
-                'dictionary_penalty': dictionary_penalty
+                'estimated_entropy': round(float(estimated_entropy), 2),
+                'charset_size': self._calculate_charset_size(password),
+                'pattern_penalty': round(pattern_penalty, 2),
+                'dictionary_penalty': round(dictionary_penalty, 2),
+                'repetition_penalty': round(repetition_penalty, 2),
+                'predictability_penalty': round(predictability_penalty, 2)
             }
         except:
-            return {
-                'shannon_entropy': 0.0,
-                'effective_entropy': 0.0,
-                'charset_size': 0,
-                'pattern_penalty': 0.0,
-                'dictionary_penalty': 0.0
-            }
+            return self._empty_entropy_result()
+
+    def _calculate_shannon_entropy(self, password: str) -> float:
+        charset_size = self._calculate_charset_size(password)
+        return len(password) * math.log2(charset_size) if charset_size > 1 else 0
+
+    def _calculate_conditional_entropy(self, password: str) -> float:
+        try:
+            bigrams = [password[i:i+2] for i in range(len(password)-1)]
+            if not bigrams:
+                return 0.0
+            
+            bigram_counts = Counter(bigrams)
+            total = len(bigrams)
+            
+            conditional_entropy = 0.0
+            for count in bigram_counts.values():
+                if count > 0:
+                    prob = count / total
+                    conditional_entropy -= prob * math.log2(prob)
+            
+            return conditional_entropy
+        except:
+            return 0.0
+
+    def _calculate_frequency_entropy(self, password: str) -> float:
+        try:
+            char_counts = Counter(password)
+            total = len(password)
+            
+            frequency_entropy = 0.0
+            for count in char_counts.values():
+                if count > 0:
+                    prob = count / total
+                    frequency_entropy -= prob * math.log2(prob)
+            
+            return frequency_entropy
+        except:
+            return 0.0
+
+    def _calculate_markov_entropy(self, password: str) -> float:
+        try:
+            if len(password) < 2:
+                return 0.0
+            
+            transitions = defaultdict(Counter)
+            for i in range(len(password) - 1):
+                transitions[password[i]][password[i+1]] += 1
+            
+            markov_entropy = 0.0
+            for current_char, next_chars in transitions.items():
+                total = sum(next_chars.values())
+                for next_char, count in next_chars.items():
+                    prob = count / total
+                    markov_entropy -= prob * math.log2(prob)
+            
+            return markov_entropy / len(transitions) if transitions else 0.0
+        except:
+            return 0.0
 
     def _calculate_charset_size(self, password: str) -> int:
         size = 0
@@ -141,26 +208,26 @@ class PasswordAnalyzer:
             size += 32
         return size
 
-    def _calculate_pattern_entropy_penalty(self, password: str) -> float:
+    def _calculate_pattern_entropy_penalty_advanced(self, password: str) -> float:
         penalty = 0.0
         
         if re.search(r'(.)\1{2,}', password):
-            penalty += 5.0
+            penalty += 8.0
         if re.search(r'(.)\1{4,}', password):
-            penalty += 10.0
+            penalty += 15.0
             
         sequential_count = len(self._find_sequential(password))
-        penalty += sequential_count * 3.0
+        penalty += sequential_count * 5.0
         
         if self._is_keyboard_pattern(password):
-            penalty += 8.0
+            penalty += 12.0
         
         if self._is_date_pattern(password):
-            penalty += 6.0
+            penalty += 10.0
         
         return penalty
 
-    def _calculate_dictionary_penalty(self, password: str) -> float:
+    def _calculate_dictionary_penalty_advanced(self, password: str) -> float:
         penalty = 0.0
         lower = password.lower()
         
@@ -169,26 +236,46 @@ class PasswordAnalyzer:
         
         for common_pass in COMMON_PASSWORDS:
             if common_pass in lower:
-                penalty += 10.0
+                penalty += 15.0
                 break
         
-        common_words = ['password', 'admin', 'user', 'test', 'demo', 'login', 'welcome']
+        common_words = ['password', 'admin', 'user', 'test', 'demo', 'login', 'welcome', 'master', 'dragon']
         for word in common_words:
             if word in lower:
-                penalty += 5.0
+                penalty += 8.0
         
         return penalty
 
-    def _is_keyboard_pattern(self, password: str) -> bool:
-        lower = password.lower()
-        for pattern in KEYBOARD_PATTERNS:
-            if pattern in lower:
-                if len(pattern) >= 3:
-                    return True
-        return False
+    def _calculate_repetition_penalty(self, password: str) -> float:
+        penalty = 0.0
+        
+        unique_chars = len(set(password))
+        total_chars = len(password)
+        repetition_ratio = 1 - (unique_chars / total_chars) if total_chars > 0 else 0
+        
+        if repetition_ratio > 0.5:
+            penalty += (repetition_ratio * 20)
+        
+        return penalty
 
-    def _is_date_pattern(self, password: str) -> bool:
-        return bool(re.search(r'(19|20)\d{2}|(\d{1,2}[/-]){2}\d{2,4}', password))
+    def _calculate_predictability_penalty(self, password: str) -> float:
+        penalty = 0.0
+        
+        uppercase_ratio = len(re.findall(r'[A-Z]', password)) / len(password) if password else 0
+        lowercase_ratio = len(re.findall(r'[a-z]', password)) / len(password) if password else 0
+        digit_ratio = len(re.findall(r'\d', password)) / len(password) if password else 0
+        special_ratio = len(re.findall(r'[!@#$%^&*()_+\-=\[\]{};:\'",.<>?/\\|`~]', password)) / len(password) if password else 0
+        
+        if abs(uppercase_ratio - 0.5) < 0.1:
+            penalty += 3.0
+        if abs(lowercase_ratio - 0.5) < 0.1:
+            penalty += 3.0
+        if abs(digit_ratio - 0.3) < 0.1:
+            penalty += 2.0
+        if abs(special_ratio - 0.2) < 0.1:
+            penalty += 2.0
+        
+        return penalty
 
     def _detect_patterns(self, password: str) -> Dict:
         lower_pass = password.lower()
@@ -210,7 +297,7 @@ class PasswordAnalyzer:
 
     def _contains_dictionary_words(self, password: str) -> bool:
         lower = password.lower()
-        common_words = ['password', 'admin', 'user', 'test', 'welcome', 'dragon']
+        common_words = ['password', 'admin', 'user', 'test', 'welcome', 'dragon', 'master']
         for word in common_words:
             if word in lower:
                 return True
@@ -225,6 +312,16 @@ class PasswordAnalyzer:
         except:
             pass
         return sequential
+
+    def _is_keyboard_pattern(self, password: str) -> bool:
+        lower = password.lower()
+        for pattern in KEYBOARD_PATTERNS:
+            if pattern in lower and len(pattern) >= 3:
+                return True
+        return False
+
+    def _is_date_pattern(self, password: str) -> bool:
+        return bool(re.search(r'(19|20)\d{2}|(\d{1,2}[/-]){2}\d{2,4}', password))
 
     def _find_vulnerabilities(self, password: str, char_types: Dict, patterns: Dict, entropy: Dict) -> List[str]:
         vulns = []
@@ -263,12 +360,12 @@ class PasswordAnalyzer:
         
         return vulns
 
-    def _estimate_crack_times(self, password: str, entropy: Dict) -> Dict:
+    def _estimate_crack_times_ml_based(self, password: str, entropy: Dict) -> Dict:
         try:
             eff_entropy = entropy.get('effective_entropy', 0)
             
             if eff_entropy == 0 or len(password) == 0:
-                return {'offline_attack': 'Less than 1 second', 'online_attack': 'Less than 1 millisecond'}
+                return {'offline_attack': 'Less than 1 second', 'online_attack': 'Less than 1ms'}
             
             total_combinations = 2 ** eff_entropy
             avg_attempts = total_combinations / 2.0
@@ -311,18 +408,19 @@ class PasswordAnalyzer:
         }
         return scenarios
 
-    def _calculate_nist_strength_score(self, password: str, char_types: Dict, entropy: Dict, vulns: List) -> int:
+    def _calculate_neural_inspired_score(self, password: str, char_types: Dict, entropy: Dict, vulns: List) -> int:
         try:
             score = 0
             eff_entropy = entropy.get('effective_entropy', 0)
+            est_entropy = entropy.get('estimated_entropy', 0)
             
-            if eff_entropy >= 60:
+            if eff_entropy >= 60 or est_entropy >= 60:
                 score += 40
-            elif eff_entropy >= 50:
+            elif eff_entropy >= 50 or est_entropy >= 50:
                 score += 30
-            elif eff_entropy >= 40:
+            elif eff_entropy >= 40 or est_entropy >= 40:
                 score += 20
-            elif eff_entropy >= 30:
+            elif eff_entropy >= 30 or est_entropy >= 30:
                 score += 10
             
             length = len(password)
@@ -351,7 +449,7 @@ class PasswordAnalyzer:
             
             return int(max(0, min(100, score)))
         except Exception as e:
-            print(f"Error in calculate_nist_strength_score: {e}")
+            print(f"Error in calculate_neural_inspired_score: {e}")
             return 0
 
     def _get_strength_label(self, score: int) -> str:
@@ -405,3 +503,22 @@ class PasswordAnalyzer:
             recs.append('Password follows security best practices!')
         
         return recs
+
+    def _empty_entropy_result(self) -> Dict:
+        return {
+            'shannon_entropy': 0.0,
+            'conditional_entropy': 0.0,
+            'frequency_entropy': 0.0,
+            'markov_entropy': 0.0,
+            'effective_entropy': 0.0,
+            'estimated_entropy': 0.0,
+            'charset_size': 0,
+            'pattern_penalty': 0.0,
+            'dictionary_penalty': 0.0,
+            'repetition_penalty': 0.0,
+            'predictability_penalty': 0.0
+        }
+
+from collections import defaultdict
+
+PasswordAnalyzer = AdvancedPasswordAnalyzer
