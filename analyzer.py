@@ -22,19 +22,28 @@ class PasswordAnalyzer:
         self.results = {}
 
     def analyze(self, password: str) -> Dict:
+        character_types = self.analyze_character_types(password)
+        patterns = self.detect_patterns(password)
+        entropy = self.calculate_entropy(password)
+        
         self.results = {
             'password_length': len(password),
             'strength_score': 0,
             'strength_label': '',
-            'entropy': self.calculate_entropy(password),
-            'character_types': self.analyze_character_types(password),
-            'patterns': self.detect_patterns(password),
-            'vulnerabilities': self.find_vulnerabilities(password),
-            'time_to_crack': self.estimate_crack_time(password),
-            'recommendations': self.get_recommendations(password)
+            'entropy': entropy,
+            'character_types': character_types,
+            'patterns': patterns,
+            'vulnerabilities': [],
+            'time_to_crack': {},
+            'recommendations': []
         }
+        
+        self.results['vulnerabilities'] = self.find_vulnerabilities(password)
+        self.results['time_to_crack'] = self.estimate_crack_time(password)
+        self.results['recommendations'] = self.get_recommendations(password)
         self.results['strength_score'] = self.calculate_strength_score()
         self.results['strength_label'] = self.get_strength_label()
+        
         return self.results
 
     def analyze_character_types(self, password: str) -> Dict[str, bool]:
@@ -103,7 +112,14 @@ class PasswordAnalyzer:
         if self.results['patterns']['sequential_chars']:
             vulns.append('sequential_characters')
         
-        if len(self.results['character_types']) == 1:
+        char_types = self.results['character_types']
+        char_variety = sum([
+            char_types['has_uppercase'],
+            char_types['has_lowercase'],
+            char_types['has_digits'],
+            char_types['has_special']
+        ])
+        if char_variety <= 1:
             vulns.append('insufficient_character_variety')
         
         return vulns
